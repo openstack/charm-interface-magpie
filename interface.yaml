@@ -1,0 +1,4 @@
+name: zookeeper-quorum
+summary: Interface used by the Apache Zookeeper quorum members
+version: 1
+maintainer: "Big Data Team <bigdata@lists.ubuntu.com>"
