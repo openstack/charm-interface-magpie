@@ -15,24 +15,31 @@ from charmhelpers.core.hookenv import relation_get, related_units
 
 class QuorumPeers(RelationBase):
     # Every unit connecting will get the same information
-    scope = scopes.GLOBAL
+    scope = scopes.UNIT
     relation_name = 'zookeeper-quorum'
 
-    @hook('{peers:zookeeper-quorum}-relation-{changed}')
+    @hook('{peers:zookeeper-quorum}-relation-{joined}')
     def changed(self):
-        self.conversation().set_state('{relation_name}.increased')
-        
-
+        conv = self.conversation()
+        conv.set_state('{relation_name}.related')
+        conv.remove_state('{relation_name}.departing')
+            
+    
     @hook('{peers:zookeeper-quorum}-relation-{departed}')
     def departed(self):
-        self.conversation().set_state('{relation_name}.decreased')
+        conv = self.conversation()
+        conv.remove_state('{relation_name}.related')
+        conv.set_state('{relation_name}.departing')
+
+
+    def dismiss(self):
+        for conv in self.conversations():
+            conv.remove_state('{relation_name}.departing')
 
 
     def get_nodes(self):
-        self.conversation().remove_state('{relation_name}.increased')
-        return related_units()
+        nodes = []
+        for conv in self.conversations():
+            nodes.append((conv.scope, conv.get_remote('private-address')))
 
-
-    def get_departed(self):
-        self.conversation().remove_state('{relation_name}.decreased')
-        return relation_get('private-address')
+        return nodes
