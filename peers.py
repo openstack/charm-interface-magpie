@@ -11,7 +11,7 @@
 # limitations under the License.
 
 from charms.reactive import RelationBase, hook, scopes
-from charmhelpers.core.hookenv import relation_get, related_units
+
 
 class QuorumPeers(RelationBase):
     # Every unit connecting will get the same information
@@ -23,24 +23,20 @@ class QuorumPeers(RelationBase):
         conv = self.conversation()
         conv.set_state('{relation_name}.relating')
         conv.remove_state('{relation_name}.departing')
-            
-    
+
     @hook('{peers:zookeeper-quorum}-relation-{departed}')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.relating')
         conv.set_state('{relation_name}.departing')
 
-
     def dismiss_departing(self):
         for conv in self.conversations():
             conv.remove_state('{relation_name}.departing')
 
-
     def dismiss_relating(self):
         for conv in self.conversations():
             conv.remove_state('{relation_name}.relating')
-
 
     def get_nodes(self):
         nodes = []
