@@ -13,30 +13,28 @@
 from charms.reactive import RelationBase, hook, scopes
 
 
-class QuorumPeers(RelationBase):
-    # Every unit connecting will get the same information
+class ZookeeperPeers(RelationBase):
     scope = scopes.UNIT
-    relation_name = 'zookeeper-quorum'
 
-    @hook('{peers:zookeeper-quorum}-relation-{joined}')
-    def changed(self):
+    @hook('{peers:zookeeper-quorum}-relation-joined')
+    def joined(self):
         conv = self.conversation()
-        conv.set_state('{relation_name}.relating')
-        conv.remove_state('{relation_name}.departing')
+        conv.remove_state('{relation_name}.departed')
+        conv.set_state('{relation_name}.joined')
 
-    @hook('{peers:zookeeper-quorum}-relation-{departed}')
+    @hook('{peers:zookeeper-quorum}-relation-departed')
     def departed(self):
         conv = self.conversation()
-        conv.remove_state('{relation_name}.relating')
-        conv.set_state('{relation_name}.departing')
+        conv.remove_state('{relation_name}.joined')
+        conv.set_state('{relation_name}.departed')
 
-    def dismiss_departing(self):
+    def dismiss_departed(self):
         for conv in self.conversations():
-            conv.remove_state('{relation_name}.departing')
+            conv.remove_state('{relation_name}.departed')
 
-    def dismiss_relating(self):
+    def dismiss_joined(self):
         for conv in self.conversations():
-            conv.remove_state('{relation_name}.relating')
+            conv.remove_state('{relation_name}.joined')
 
     def get_nodes(self):
         nodes = []
