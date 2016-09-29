@@ -13,16 +13,16 @@
 from charms.reactive import RelationBase, hook, scopes
 
 
-class ZookeeperPeers(RelationBase):
+class MagpiePeers(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{peers:zookeeper-quorum}-relation-joined')
+    @hook('{peers:magpie}-relation-joined')
     def joined(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.departed')
         conv.set_state('{relation_name}.joined')
 
-    @hook('{peers:zookeeper-quorum}-relation-departed')
+    @hook('{peers:magpie}-relation-departed')
     def departed(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.joined')
