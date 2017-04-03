@@ -11,7 +11,7 @@
 # limitations under the License.
 
 from charms.reactive import RelationBase, hook, scopes
-
+from charmhelpers.core import hookenv
 
 class MagpiePeers(RelationBase):
     scope = scopes.UNIT
@@ -40,5 +40,52 @@ class MagpiePeers(RelationBase):
         nodes = []
         for conv in self.conversations():
             nodes.append((conv.scope, conv.get_remote('private-address')))
-
         return nodes
+
+#    def initialise_iperf(self):
+#        '''
+#        First use juju leadership to pick client, then handle in code
+#        '''
+#        for conv in self.conversations():
+#            conv.set_remote('iperf.initialised')
+#
+#    def iperf_initialised(self):
+#        '''
+#        Check if initialised
+#        '''
+#        for conv in self.conversations():
+#            if conv.get_remote('iperf.initialised'):
+#                return True
+#
+    def set_iperf_client(self):
+        '''
+        The unit which is currently allowed to test (all) other units
+        '''
+        for conv in self.conversations():
+            conv.set_remote('is_iperf_client', True)
+
+    def get_iperf_client(self):
+        '''
+        Checks which unit should currently be performing iperf checks
+        '''
+        for conv in self.conversations():
+            if conv.get_remote('is_iperf_client'):
+                return conv.get_remote('private_address')
+
+    def set_iperf_server_ready(self):
+        for conv in self.conversations():
+            conv.set_state('iperf.server.ready')
+
+    def set_iperf_server_checked(self):
+        for conv in self.conversations():
+            conv.set_state('iperf.server.checked')
+
+    def check_ready_iperf_servers(self):
+        nodes_ready = []
+        for conv in self.conversations():
+            hookenv.log(" CHECKING CONVERSAITIOSN ------------------------------------------------------", 'INFO')
+            if conv.get_remote('iperf.server.ready'):
+                hookenv.log(" YEP I FOUND ONE HERE ------------------------------------------------------", 'INFO')
+                nodes_ready.append((conv.scope, conv.get_remote('private-address')))
+        return nodes_ready
+
