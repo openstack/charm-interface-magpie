@@ -11,7 +11,7 @@
 # limitations under the License.
 
 from charms.reactive import RelationBase, hook, scopes
-from charmhelpers.core import hookenv
+
 
 class MagpiePeers(RelationBase):
     scope = scopes.UNIT
@@ -64,6 +64,6 @@ class MagpiePeers(RelationBase):
         nodes_ready = []
         for conv in self.conversations():
             if conv.get_remote('iperf.server'):
-                nodes_ready.append((conv.scope, conv.get_remote('private-address')))
+                nodes_ready.append((conv.scope,
+                                    conv.get_remote('private-address')))
         return nodes_ready
-
