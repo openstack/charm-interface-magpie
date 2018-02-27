@@ -40,5 +40,30 @@ class MagpiePeers(RelationBase):
         nodes = []
         for conv in self.conversations():
             nodes.append((conv.scope, conv.get_remote('private-address')))
-
         return nodes
+
+    def set_iperf_checked(self):
+        for conv in self.conversations():
+            conv.set_remote('iperf.checked', conv.scope)
+
+    def get_iperf_checked(self):
+        nodes = []
+        for conv in self.conversations():
+            nodes.append(conv.get_remote('iperf.checked'))
+        return nodes
+
+    def set_iperf_server_ready(self):
+        for conv in self.conversations():
+            conv.set_remote('iperf.server', True)
+
+    def set_iperf_server_checked(self):
+        for conv in self.conversations():
+            conv.set_remote('iperf.server.checked')
+
+    def check_ready_iperf_servers(self):
+        nodes_ready = []
+        for conv in self.conversations():
+            if conv.get_remote('iperf.server'):
+                nodes_ready.append((conv.scope,
+                                    conv.get_remote('private-address')))
+        return nodes_ready
