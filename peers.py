@@ -43,8 +43,11 @@ class MagpiePeers(RelationBase):
         return nodes
 
     def set_iperf_checked(self):
+        postnode = []
         for conv in self.conversations():
-            conv.set_remote('iperf.checked', conv.scope)
+            prenode = conv.get_remote('iperf.checked')
+            postnode.append(str(prenode) + " " + conv.scope)
+            conv.set_remote('iperf.checked', postnode)
 
     def get_iperf_checked(self):
         nodes = []
