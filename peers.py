@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import netaddr
+import netifaces
+
 from charms.reactive import RelationBase, hook, scopes
 
 
@@ -38,10 +42,21 @@ class MagpiePeers(RelationBase):
         for conv in self.conversations():
             conv.remove_state('{relation_name}.joined')
 
-    def get_nodes(self):
+    def get_nodes(self, cidr=None):
         nodes = []
+        if cidr:
+            network = netaddr.IPNetwork(cidr)
         for conv in self.conversations():
-            nodes.append((conv.scope, conv.get_remote('private-address')))
+            iperf_addresses = conv.get_remote('iperf_addresses')
+            ip = None
+            if cidr and iperf_addresses:
+                for addr in json.loads(iperf_addresses):
+                    if netaddr.IPNetwork(addr) in network:
+                        ip = addr
+                        break
+            if not ip:
+                ip = conv.get_remote('private-address')
+            nodes.append((conv.scope, ip))
         return nodes
 
     def set_iperf_checked(self):
@@ -72,3 +87,12 @@ class MagpiePeers(RelationBase):
                 nodes_ready.append((conv.scope,
                                     conv.get_remote('private-address')))
         return nodes_ready
+
+    def advertise_addresses(self):
+        addrs = []
+        for iface in netifaces.interfaces():
+            for addr in netifaces.ifaddresses(iface).get(
+                    netifaces.AF_INET, []):
+                addrs.append(addr['addr'])
+        for conv in self.conversations():
+            conv.set_remote('iperf_addresses', json.dumps(sorted(addrs)))
