@@ -1,4 +1,4 @@
 name: magpie 
 summary: Interface used by the Magpie charm layer for peer network tests
 version: 1
-maintainer: "Andrew McLeod <andrew.mcleod@canonical.com>"
+maintainer: OpenStack Charmers <openstack-discuss@lists.openstack.org>
