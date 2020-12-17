@@ -2,7 +2,6 @@
 
 This interface layer handles the communication among Magpie peers.
 
-
 # Usage
 
 ## Peers
@@ -42,5 +41,8 @@ def check_peers(magpie):
     # do stuff with nodes
 ```
 
-# Contact Information
+# Bugs
 
+Please report bugs on [Launchpad](https://bugs.launchpad.net/charm-interface-magpie/+filebug).
+
+For general questions please refer to the OpenStack [Charm Guide](https://docs.openstack.org/charm-guide/latest/).
